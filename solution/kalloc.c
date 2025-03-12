@@ -121,7 +121,7 @@ char *khugealloc(void){
     acquire(&hugekmem.lock);
   }
   r = hugekmem.hugeFreeList;
-  if(r){
+  if(r){ 
     hugekmem.hugeFreeList = r->next;
   }
   if(hugekmem.use_lock){
