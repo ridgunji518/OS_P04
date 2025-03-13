@@ -68,6 +68,9 @@ char*           kalloc(void);
 void            kfree(char*);
 void            kinit1(void*, void*);
 void            kinit2(void*, void*);
+void            khugeinit(void *virt_start, void *virt_end);
+char*           khugealloc(void);
+void            khugefree(char *v);
 
 // kbd.c
 void            kbdintr(void);
