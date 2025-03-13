@@ -5,5 +5,5 @@ email: idgunji@wisc.edu
 
 Partner 2
 Name: Samarth Boranna
-CSL: 
-email: 
+CSL: boranna
+email: boranna@wisc.edu
