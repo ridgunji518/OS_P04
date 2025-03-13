@@ -10,6 +10,7 @@
 #include "spinlock.h"
 
 void freerange(void *vstart, void *vend);
+void freerange_huge(void *vstart, void *vend);
 extern char end[]; // first address after kernel loaded from ELF file
                    // defined by the kernel linker script in kernel.ld
 
