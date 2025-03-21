@@ -33,7 +33,7 @@ main(void)
   ideinit();       // disk 
   startothers();   // start other processors
   kinit2(P2V(4*1024*1024), P2V(PHYSTOP)); // must come after startothers()
-  khugeinit(HUGE_PAGE_START, HUGE_PAGE_END);
+  khugeinit((void*)HUGE_PAGE_START, (void*)HUGE_PAGE_END);
   userinit();      // first user process
   mpmain();        // finish this processor's setup
 }
