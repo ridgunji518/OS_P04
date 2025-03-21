@@ -124,6 +124,7 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 int             setthp(int);
+int             getthp(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

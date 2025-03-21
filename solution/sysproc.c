@@ -151,3 +151,7 @@ sys_setthp(void){
   setthp(thp);
   return 0;
 }
+
+int sys_getthp(void){
+  return getthp();
+}

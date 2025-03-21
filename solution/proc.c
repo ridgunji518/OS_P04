@@ -552,3 +552,7 @@ int setthp(int flag){
   thp = flag;
   return 0;
 }
+
+int getthp(void){
+  return thp;
+}
