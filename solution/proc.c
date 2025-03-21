@@ -15,6 +15,7 @@ struct {
 static struct proc *initproc;
 
 int nextpid = 1;
+int thp = 0;
 extern void forkret(void);
 extern void trapret(void);
 
@@ -546,4 +547,13 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+int setthp(int flag){
+  thp = flag;
+  return 0;
+}
+
+int getthp(void){
+  return thp;
 }

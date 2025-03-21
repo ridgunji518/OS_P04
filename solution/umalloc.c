@@ -109,25 +109,49 @@ malloc(uint nbytes)
   uint nunits;
 
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
-  if((prevp = freep) == 0){
-    base.s.ptr = freep = prevp = &base;
-    base.s.size = 0;
-  }
-  for(p = prevp->s.ptr; ; prevp = p, p = p->s.ptr){
-    if(p->s.size >= nunits){
-      if(p->s.size == nunits)
-        prevp->s.ptr = p->s.ptr;
-      else {
-        p->s.size -= nunits;
-        p += p->s.size;
-        p->s.size = nunits;
-      }
-      freep = prevp;
-      return (void*)(p + 1);
+  if(nbytes < (1 << 20) || getthp() == 0){
+    if((prevp = freep) == 0){
+      base.s.ptr = freep = prevp = &base;
+      base.s.size = 0;
     }
-    if(p == freep)
-      if((p = morecore(nunits)) == 0)
-        return 0;
+    for(p = prevp->s.ptr; ; prevp = p, p = p->s.ptr){
+      if(p->s.size >= nunits){
+        if(p->s.size == nunits)
+          prevp->s.ptr = p->s.ptr;
+        else {
+          p->s.size -= nunits;
+          p += p->s.size;
+          p->s.size = nunits;
+        }
+        freep = prevp;
+        return (void*)(p + 1);
+      }
+      if(p == freep)
+        if((p = morecore(nunits)) == 0)
+          return 0;
+    }
+  }
+  else{
+    if((prevp = hugeFreep) == 0){
+      hugeBase.s.ptr = hugeFreep = prevp = &hugeBase;
+      hugeBase.s.size = 0;
+    }
+    for(p = prevp->s.ptr; ; prevp = p, p = p->s.ptr){
+      if(p->s.size >= nunits){
+        if(p->s.size == nunits)
+          prevp->s.ptr = p->s.ptr;
+        else {
+          p->s.size -= nunits;
+          p += p->s.size;
+          p->s.size = nunits;
+        }
+        hugeFreep = prevp;
+        return (void*)(p + 1);
+      }
+      if(p == hugeFreep)
+        if((p = hugeMorecore(nunits)) == 0)
+          return 0;
+    }
   }
 }
 
@@ -135,8 +159,9 @@ void*
 vmalloc(uint nbytes, int hugeFlag)
 {
 
-  if(hugeFlag != VMALLOC_SIZE_BASE || hugeFlag != VMALLOC_SIZE_HUGE){
-    //error stmnt
+  if(hugeFlag != VMALLOC_SIZE_BASE && hugeFlag != VMALLOC_SIZE_HUGE){
+    printf("Please pass VMALLOC_SIZE_BASE or VMALLOC_SIZE_HUGE as flag.\n");
+    exit();
   }
   Header *p, *prevp;
   uint nunits;
