@@ -131,7 +131,6 @@ userinit(void)
     panic("userinit: out of memory?");
   inituvm(p->pgdir, _binary_initcode_start, (int)_binary_initcode_size);
   p->sz = PGSIZE;
-  p->hugesz = HUGE_PAGE_SIZE; // setup hugesz for first process
   memset(p->tf, 0, sizeof(*p->tf));
   p->tf->cs = (SEG_UCODE << 3) | DPL_USER;
   p->tf->ds = (SEG_UDATA << 3) | DPL_USER;
@@ -175,13 +174,13 @@ growproc(int n, int flag)
     curproc->sz = sz; 
   }
   else{
-    sz = curproc->hugesz;
+    sz = curproc->hugesz + HUGE_VA_OFFSET;
     if(n > 0){
-      if((sz = allocuvm(curproc->pgdir, HUGE_VA_OFFSET + sz, HUGE_VA_OFFSET + sz + n)) == 0)
+      if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
         return -1;
     }
     else if(n < 0){
-      if((sz = deallocuvm(curproc->pgdir, HUGE_VA_OFFSET + sz, HUGE_VA_OFFSET + sz + n)) == 0)
+      if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
         return -1;
     }
     curproc->hugesz = sz - HUGE_VA_OFFSET;
@@ -214,6 +213,7 @@ fork(void)
     return -1;
   }
   np->sz = curproc->sz;
+  np->hugesz = curproc->hugesz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
 

@@ -114,6 +114,7 @@ void khugeinit(void *virt_start, void *virt_end){
   initlock(&hugekmem.lock, "hugekmem");
   hugekmem.use_lock = 0;
   freerange_huge(virt_start, virt_end);
+  hugekmem.use_lock = 1;
 }
 
 char *khugealloc(void){
