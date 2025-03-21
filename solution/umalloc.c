@@ -47,7 +47,7 @@ free(void *ap)
 }
 
 void
-vFree(void *ap)
+vfree(void *ap)
 {
   Header *bp, *p;
 
@@ -98,7 +98,7 @@ hugeMorecore(uint nu)
     return 0;
   hp = (Header*)p;
   hp->s.size = nu;
-  vFree((void*)(hp + 1));
+  vfree((void*)(hp + 1));
   return hugeFreep;
 }
 
