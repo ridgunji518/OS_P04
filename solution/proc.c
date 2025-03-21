@@ -184,7 +184,7 @@ growproc(int n, int flag)
       if((sz = deallocuvm(curproc->pgdir, HUGE_VA_OFFSET + sz, HUGE_VA_OFFSET + sz + n)) == 0)
         return -1;
     }
-    curproc->hugesz = sz;
+    curproc->hugesz = sz - HUGE_VA_OFFSET;
   }
   switchuvm(curproc);
   return 0;

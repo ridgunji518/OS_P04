@@ -47,7 +47,7 @@ free(void *ap)
 }
 
 void
-vFree(void *ap)
+vfree(void *ap)
 {
   Header *bp, *p;
 
@@ -98,7 +98,7 @@ hugeMorecore(uint nu)
     return 0;
   hp = (Header*)p;
   hp->s.size = nu;
-  vFree((void*)(hp + 1));
+  vfree((void*)(hp + 1));
   return hugeFreep;
 }
 
@@ -160,7 +160,7 @@ vmalloc(uint nbytes, int hugeFlag)
 {
 
   if(hugeFlag != VMALLOC_SIZE_BASE && hugeFlag != VMALLOC_SIZE_HUGE){
-    printf("Please pass VMALLOC_SIZE_BASE or VMALLOC_SIZE_HUGE as flag.\n");
+    printf(2, "Please pass VMALLOC_SIZE_BASE or VMALLOC_SIZE_HUGE as flag.\n");
     exit();
   }
   Header *p, *prevp;
