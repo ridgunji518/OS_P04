@@ -20,6 +20,7 @@ typedef union header Header;
 
 static Header base;
 static Header *freep;
+static Header *hugeFreep;
 
 void
 free(void *ap)
@@ -86,5 +87,43 @@ malloc(uint nbytes)
     if(p == freep)
       if((p = morecore(nunits)) == 0)
         return 0;
+  }
+}
+
+void*
+vmalloc(uint nbytes, int hugeFlag)
+{
+
+  if(hugeFlag != VMALLOC_SIZE_BASE || hugeFlag != VMALLOC_SIZE_HUGE){
+    //error stmnt
+  }
+  Header *p, *prevp;
+  uint nunits;
+
+  nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
+  if(hugeFlag == VMALLOC_SIZE_BASE){
+    if((prevp = freep) == 0){
+      base.s.ptr = freep = prevp = &base;
+      base.s.size = 0;
+    }
+    for(p = prevp->s.ptr; ; prevp = p, p = p->s.ptr){
+      if(p->s.size >= nunits){
+        if(p->s.size == nunits)
+          prevp->s.ptr = p->s.ptr;
+        else {
+          p->s.size -= nunits;
+          p += p->s.size;
+          p->s.size = nunits;
+        }
+        freep = prevp;
+        return (void*)(p + 1);
+      }
+      if(p == freep)
+        if((p = morecore(nunits)) == 0)
+          return 0;
+    }
+  }
+  else{
+
   }
 }
