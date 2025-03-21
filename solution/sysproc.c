@@ -55,7 +55,7 @@ sys_sbrk(void)
     huge_pages_flag = 0;
     
   if (huge_pages_flag) {
-    addr = myproc()->hugesz;
+    addr = myproc()->hugesz + HUGE_VA_OFFSET;
     if (growproc(n, huge_pages_flag) < 0)
       return -1;
   }
@@ -141,4 +141,17 @@ sys_procpgdirinfo()
   buf[0] = base_cnt; // base page count
   buf[1] = huge_cnt; // huge page count
   return 0;
+}
+
+int
+sys_setthp(void){
+  int thp;
+  if(argint(0, &thp) < 0)
+    return -1;
+  setthp(thp);
+  return 0;
+}
+
+int sys_getthp(void){
+  return getthp();
 }

@@ -1,6 +1,9 @@
 struct stat;
 struct rtcdate;
 
+#define VMALLOC_SIZE_BASE 0
+#define VMALLOC_SIZE_HUGE 1
+
 // system calls
 int fork(void);
 int exit(void) __attribute__((noreturn));
@@ -20,11 +23,13 @@ int mkdir(const char*);
 int chdir(const char*);
 int dup(int);
 int getpid(void);
-char* sbrk(int);
+char* sbrk(int, int);
 int sleep(int);
 int uptime(void);
 int printhugepde(void);
 int procpgdirinfo(int*);
+int setthp(int);
+int getthp(void);
 
 // ulib.c
 int stat(const char*, struct stat*);
@@ -37,5 +42,7 @@ char* gets(char*, int max);
 uint strlen(const char*);
 void* memset(void*, int, uint);
 void* malloc(uint);
+void* vmalloc(uint, int);
 void free(void*);
+void vfree(void*);
 int atoi(const char*);
