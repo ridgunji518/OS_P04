@@ -224,8 +224,6 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   char *mem;
   uint a;
 
-  if(newsz >= KERNBASE)
-    return 0;
   if(newsz < oldsz)
     return oldsz;
 
@@ -256,23 +254,42 @@ int
 deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 {
   pte_t *pte;
+  pde_t *pde;
   uint a, pa;
 
   if(newsz >= oldsz)
     return oldsz;
 
-  a = PGROUNDUP(newsz);
-  for(; a  < oldsz; a += PGSIZE){
-    pte = walkpgdir(pgdir, (char*)a, 0);
-    if(!pte)
-      a = PGADDR(PDX(a) + 1, 0, 0) - PGSIZE;
-    else if((*pte & PTE_P) != 0){
-      pa = PTE_ADDR(*pte);
+  a = newsz;
+  if (a >= HUGE_VA_OFFSET) { 
+    a = HUGEPGROUNDUP(newsz);
+    for(; a < oldsz; a += HUGE_PAGE_SIZE){
+      pde = &pgdir[PDX(a)];
+      if(!(*pde & PTE_P)){
+        continue;
+      }
+      pa = PTE_ADDR(*pde);
       if(pa == 0)
-        panic("kfree");
+        panic("kfree - khugefree");
       char *v = P2V(pa);
-      kfree(v);
-      *pte = 0;
+      khugefree(v);
+      *pde = 0;
+    }
+  }
+  else {
+    a = PGROUNDUP(newsz);
+    for(; a  < oldsz; a += PGSIZE){
+      pte = walkpgdir(pgdir, (char*)a, 0);
+      if(!pte)
+        a = PGADDR(PDX(a) + 1, 0, 0) - PGSIZE;
+      else if((*pte & PTE_P) != 0){
+        pa = PTE_ADDR(*pte);
+        if(pa == 0)
+          panic("kfree");
+        char *v = P2V(pa);
+        kfree(v);
+        *pte = 0;
+      }
     }
   }
   return newsz;
