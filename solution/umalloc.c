@@ -76,7 +76,7 @@ morecore(uint nu)
 
   if(nu < 4096)
     nu = 4096;
-  p = sbrk(nu * sizeof(Header));
+  p = sbrk(nu * sizeof(Header), VMALLOC_SIZE_BASE);
   if(p == (char*)-1)
     return 0;
   hp = (Header*)p;
@@ -93,7 +93,7 @@ hugeMorecore(uint nu)
 
   if(nu < ((1<<22) / sizeof(Header)))
     nu = (1<<22) / sizeof(Header);
-  p = sbrk(nu * sizeof(Header));
+  p = sbrk(nu * sizeof(Header), VMALLOC_SIZE_HUGE);
   if(p == (char*)-1)
     return 0;
   hp = (Header*)p;
@@ -158,9 +158,8 @@ malloc(uint nbytes)
 void*
 vmalloc(uint nbytes, int hugeFlag)
 {
-
   if(hugeFlag != VMALLOC_SIZE_BASE && hugeFlag != VMALLOC_SIZE_HUGE){
-    printf("Please pass VMALLOC_SIZE_BASE or VMALLOC_SIZE_HUGE as flag.\n");
+    printf(2, "Please pass VMALLOC_SIZE_BASE or VMALLOC_SIZE_HUGE as flag.\n");
     exit();
   }
   Header *p, *prevp;
