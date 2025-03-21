@@ -1,6 +1,9 @@
 struct stat;
 struct rtcdate;
 
+#define VMALLOC_SIZE_BASE 0
+#define VMALLOC_SIZE_HUGE 1
+
 // system calls
 int fork(void);
 int exit(void) __attribute__((noreturn));
@@ -37,5 +40,7 @@ char* gets(char*, int max);
 uint strlen(const char*);
 void* memset(void*, int, uint);
 void* malloc(uint);
+void* vmalloc(uint, int);
 void free(void*);
+void vfree(void*);
 int atoi(const char*);
