@@ -153,10 +153,10 @@ userinit(void)
   release(&ptable.lock);
 }
 
-// Grow current process's memory by n bytes.
+// Grow current process's memory by n bytes.kk
 // Return 0 on success, -1 on failure.
 int
-growproc(int n)
+growproc(int n, int flag)
 {
   uint sz;
   struct proc *curproc = myproc();
