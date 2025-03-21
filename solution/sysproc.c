@@ -55,7 +55,7 @@ sys_sbrk(void)
     huge_pages_flag = 0;
     
   if (huge_pages_flag) {
-    addr = myproc()->hugesz;
+    addr = myproc()->hugesz + HUGE_VA_OFFSET;
     if (growproc(n, huge_pages_flag) < 0)
       return -1;
   }
