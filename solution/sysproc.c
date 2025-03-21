@@ -47,12 +47,23 @@ sys_sbrk(void)
 {
   int addr;
   int n;
+  int huge_pages_flag = 0;
 
   if(argint(0, &n) < 0)
     return -1;
-  addr = myproc()->sz;
-  if(growproc(n) < 0)
-    return -1;
+  if (argint(1, &huge_pages_flag) < 0)
+    huge_pages_flag = 0;
+    
+  if (huge_pages_flag) {
+    addr = myproc()->hugesz;
+    if (growproc(n, huge_pages_flag) < 0)
+      return -1;
+  }
+  else {
+    addr = myproc()->sz;
+    if(growproc(n, huge_pages_flag) < 0)
+      return -1;
+  }
   return addr;
 }
 
