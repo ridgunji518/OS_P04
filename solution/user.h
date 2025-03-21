@@ -28,6 +28,7 @@ int sleep(int);
 int uptime(void);
 int printhugepde(void);
 int procpgdirinfo(int*);
+int setthp(int);
 
 // ulib.c
 int stat(const char*, struct stat*);

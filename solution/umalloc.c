@@ -160,7 +160,8 @@ vmalloc(uint nbytes, int hugeFlag)
 {
 
   if(hugeFlag != VMALLOC_SIZE_BASE && hugeFlag != VMALLOC_SIZE_HUGE){
-    //error stmnt
+    printf("Please pass VMALLOC_SIZE_BASE or VMALLOC_SIZE_HUGE as flag.\n");
+    exit();
   }
   Header *p, *prevp;
   uint nunits;

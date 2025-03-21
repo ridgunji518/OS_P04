@@ -142,3 +142,12 @@ sys_procpgdirinfo()
   buf[1] = huge_cnt; // huge page count
   return 0;
 }
+
+int
+sys_setthp(void){
+  int thp;
+  if(argint(0, &thp) < 0)
+    return -1;
+  setthp(thp);
+  return 0;
+}
