@@ -382,7 +382,7 @@ copyuvm(pde_t *pgdir, uint sz, uint hugesz)
   if((d = setupkvm()) == 0)
     return 0;
 
-  for(i = 0; i < hugesz; i += HUGE_PAGE_SIZE){
+  for(i = HUGE_VA_OFFSET; i < hugesz + HUGE_VA_OFFSET; i += HUGE_PAGE_SIZE){
     pde_t *pde = &pgdir[PDX(i)];
     if (!(*pde & PTE_PS)) {
       continue;
