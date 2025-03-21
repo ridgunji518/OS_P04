@@ -68,15 +68,11 @@ mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm)
   if (pa >= HUGE_PAGE_START && pa < HUGE_PAGE_END) {
     a = (char*)HUGEPGROUNDDOWN((uint)va);
     last = (char*)HUGEPGROUNDDOWN(((uint)va) + size - 1);
-    for(;;){
+    for(; a <= last; a += HUGE_PAGE_SIZE, pa += HUGE_PAGE_SIZE){
       pde = &pgdir[PDX(a)];
       if(*pde & PTE_P)
         panic("hugepage - remap");
       *pde = pa | perm | PTE_P | PTE_PS;
-      if(a == last)
-        break;
-      a += HUGE_PAGE_SIZE;
-      pa += HUGE_PAGE_SIZE;
     }
   }
   else {
@@ -249,7 +245,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
     return oldsz;
 
   a = newsz;
-  if(a >= HUGE_PAGE_SIZE){
+  if(a >= HUGE_VA_OFFSET){
     a = HUGEPGROUNDUP(oldsz);
     for(; a < newsz; a += HUGE_PAGE_SIZE){
       mem = khugealloc();
@@ -293,7 +289,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 // need to be less than oldsz.  oldsz can be larger than the actual
 // process size.  Returns the new process size.
 int
-deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
+deallocuvm(pde_t *pgdir, uint newsz, uint oldsz)
 {
   pte_t *pte;
   pde_t *pde;
@@ -348,6 +344,10 @@ freevm(pde_t *pgdir)
     panic("freevm: no pgdir");
   deallocuvm(pgdir, KERNBASE, 0);
   for(i = 0; i < NPDENTRIES; i++){
+    // Skip over huge pages
+    if(pgdir[i] & PTE_PS){
+      continue;
+    }
     if(pgdir[i] & PTE_P){
       char * v = P2V(PTE_ADDR(pgdir[i]));
       kfree(v);
@@ -372,7 +372,7 @@ clearpteu(pde_t *pgdir, char *uva)
 // Given a parent process's page table, create a copy
 // of it for a child.
 pde_t*
-copyuvm(pde_t *pgdir, uint sz)
+copyuvm(pde_t *pgdir, uint sz, uint hugesz)
 {
   pde_t *d;
   pte_t *pte;
@@ -381,7 +381,27 @@ copyuvm(pde_t *pgdir, uint sz)
 
   if((d = setupkvm()) == 0)
     return 0;
+
+  for(i = 0; i < hugesz; i += HUGE_PAGE_SIZE){
+    pde_t *pde = &pgdir[PDX(i)];
+    if (!(*pde & PTE_PS)) {
+      continue;
+    }
+    pa = PTE_ADDR(*pde);
+    flags = PTE_FLAGS(*pde);
+    if((mem = khugealloc()) == 0)
+      goto bad;
+    memmove(mem, (char*)P2V(pa), HUGE_PAGE_SIZE);
+    d[PDX(i)] = V2P(mem) | flags | PTE_P | PTE_PS; // Map huge pages to pde
+  }
+  
   for(i = 0; i < sz; i += PGSIZE){
+
+    // Check if this is a huge page, don't double handle
+    if (i >= HUGE_VA_OFFSET) {
+      break;
+    }
+
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if(!(*pte & PTE_P))
