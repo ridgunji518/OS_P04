@@ -1,0 +1,8 @@
+XV6_TEST_OUTPUT After malloc with THP enabled, 1048575B - program base pages:257 huge pages:0
+XV6_TEST_OUTPUT After malloc with THP enabled, 200B - program base pages:265 huge pages:0
+XV6_TEST_OUTPUT After malloc with THP enabled, 1MB - program base pages:265 huge pages:1
+XV6_TEST_OUTPUT After malloc with THP enabled, 2MB - program base pages:265 huge pages:1
+XV6_TEST_OUTPUT After malloc with THP enabled, 8KB - program base pages:265 huge pages:1
+XV6_TEST_OUTPUT After malloc with THP enabled, 1MB - program base pages:265 huge pages:2
+XV6_TEST_OUTPUT After malloc with THP enabled, 4MB - program base pages:265 huge pages:3
+XV6_TEST_OUTPUT After malloc with THP enabled, less than 1MB - program base pages:265 huge pages:3

@@ -1,0 +1,9 @@
+./edit-makefile.sh ../solution/Makefile test_15_a,test_15_b > ../solution/Makefile.test
+cp -f tests/test_15_a.c ../solution/test_15_a.c
+cp -f tests/test_15_b.c ../solution/test_15_b.c
+cd ../solution/
+make -f Makefile.test clean
+make -f Makefile.test xv6.img
+make -f Makefile.test fs.img
+cd ../tests
+
