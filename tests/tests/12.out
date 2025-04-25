@@ -1,0 +1,3 @@
+XV6_TEST_OUTPUT Max, 508MB - program base pages:0 huge pages:128
+XV6_TEST_OUTPUT hugealloc - allocuvm out of memory
+XV6_TEST_OUTPUT vmalloc fails correctly
